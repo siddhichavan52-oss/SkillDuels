@@ -1,0 +1,12 @@
+/* Global reset only. Design tokens and component styles live in components/styles.css */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+}
