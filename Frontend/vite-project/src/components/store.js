@@ -56,61 +56,20 @@ function colorFor(name) {
   return AVATAR_COLORS[h % AVATAR_COLORS.length]
 }
 
+function defaultAdmin() {
+  return {
+    ...blankStats(),
+    id: 'u_admin',
+    name: 'Admin',
+    email: 'admin@gmail.com',
+    passwordHash: hashPassword('pass123'),
+    role: 'admin',
+    avatarColor: '#C3A1FF',
+  }
+}
+
 function buildSeed() {
-  const now = Date.now()
-  const users = [
-    {
-      ...blankStats(),
-      id: 'u_admin',
-      name: 'Admin',
-      email: 'admin@skillduels.dev',
-      passwordHash: hashPassword('Admin@123'),
-      role: 'admin',
-      avatarColor: '#C3A1FF',
-    },
-    {
-      ...blankStats(),
-      id: 'u_ava',
-      name: 'Ava Sharma',
-      email: 'ava@skillduels.dev',
-      passwordHash: hashPassword('Player@123'),
-      role: 'player',
-      avatarColor: '#FFC93C',
-      xp: 2650,
-      weekly: { key: weekKey(), xp: 410, matches: 2 },
-      matches: 12,
-      wins: 7,
-      losses: 4,
-      draws: 1,
-      winStreak: 1,
-      streak: 2,
-      lastPlayed: dayKey(-1),
-      perfect: 0,
-      quick: 6,
-      categoriesPlayed: ['technical', 'aptitude', 'logic'],
-      badges: ['first_win', 'polymath', 'veteran'],
-      history: [
-        { id: 'h3', at: now - 26 * 3600e3, categoryId: 'technical', oppName: 'Kabir Shah', myScore: 610, oppScore: 540, result: 'win', xp: 710, mode: 'live' },
-        { id: 'h2', at: now - 50 * 3600e3, categoryId: 'logic', oppName: 'Priya Nair', myScore: 380, oppScore: 560, result: 'loss', xp: 405, mode: 'live' },
-        { id: 'h1', at: now - 74 * 3600e3, categoryId: 'aptitude', oppName: 'Nova', myScore: 480, oppScore: 480, result: 'draw', xp: 530, mode: 'bot' },
-      ],
-    },
-    ...SEED_PLAYERS.map((p) => ({
-      ...blankStats(),
-      id: `u_${slug(p.name)}`,
-      name: p.name,
-      email: `${slug(p.name)}@skillduels.dev`,
-      passwordHash: hashPassword(uid('seed')),
-      role: 'player',
-      avatarColor: colorFor(p.name),
-      xp: p.xp,
-      weekly: { key: weekKey(), xp: p.weekly, matches: Math.ceil(p.weekly / 400) },
-      matches: p.matches,
-      wins: p.wins,
-      losses: p.matches - p.wins,
-    })),
-  ]
-  return { users, categories: SEED_CATEGORIES, questions: SEED_QUESTIONS }
+  return { users: [defaultAdmin()], categories: SEED_CATEGORIES, questions: SEED_QUESTIONS }
 }
 
 /* ---------- State container ---------- */
@@ -125,7 +84,19 @@ function load() {
       if (key?.startsWith(USER_PREFIX)) users.push(JSON.parse(localStorage.getItem(key)))
     }
     const content = JSON.parse(localStorage.getItem(CONTENT_KEY) || 'null')
-    if (users.length && content?.categories && content?.questions) return { users, ...content }
+    if (users.length && content?.categories && content?.questions) {
+      if (!users.some((u) => u.email === 'admin@gmail.com')) {
+        const admin = defaultAdmin()
+        users.push(admin)
+        localStorage.setItem(USER_PREFIX + admin.id, JSON.stringify(admin))
+      }
+      const catMap = new Map(content.categories.map((c) => [c.id, c]))
+      for (const sc of SEED_CATEGORIES) if (!catMap.has(sc.id)) content.categories.push(sc)
+      const qMap = new Map(content.questions.map((q) => [q.id, q]))
+      for (const sq of SEED_QUESTIONS) if (!qMap.has(sq.id)) content.questions.push(sq)
+      localStorage.setItem(CONTENT_KEY, JSON.stringify(content))
+      return { users, ...content }
+    }
   } catch {
     /* fall through to seed */
   }
@@ -258,7 +229,7 @@ export function register({ name, email, password }) {
     name: cleanName,
     email: cleanEmail,
     passwordHash: hashPassword(password),
-    role: 'player',
+    role: state.users.length === 0 ? 'admin' : 'player',
     avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
   }
   commit({ ...state, users: [...state.users, user] })

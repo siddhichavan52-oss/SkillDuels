@@ -18,14 +18,9 @@ No extra dependencies are needed. All app code lives in `src/components/`.
 - `#/login` and `#/signup` account pages
 - After signing in: Home, Play, Leaderboard and Profile for players; Admin and Leaderboard for administrators
 
-## Demo accounts
+## Accounts
 
-| Role   | Email                  | Password   |
-| ------ | ---------------------- | ---------- |
-| Player | ava@skillduels.dev     | Player@123 |
-| Admin  | admin@skillduels.dev   | Admin@123  |
-
-You can also create your own player account on the sign-up tab.
+Create an account directly on the sign-up page to start playing.
 
 ## Demo a live two-player duel
 

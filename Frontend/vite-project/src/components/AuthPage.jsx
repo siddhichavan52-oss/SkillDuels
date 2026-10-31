@@ -28,12 +28,6 @@ export default function AuthPage({ initialMode = 'login', navigate }) {
     toast(mode === 'login' ? `Welcome back, ${res.user.name.split(' ')[0]}.` : 'Account created. Your first duel is one click away.', 'success')
   }
 
-  const fillDemo = (email, password) => {
-    setMode('login')
-    setErrors({})
-    setForm({ name: '', email, password })
-  }
-
   return (
     <div className="auth">
       <section className="auth-brand" aria-labelledby="brand-title">
@@ -71,7 +65,7 @@ export default function AuthPage({ initialMode = 'login', navigate }) {
 
             {mode === 'register' && (
               <Field label="Your name" error={errors.name}>
-                {(p) => <input {...p} type="text" autoComplete="name" value={form.name} onChange={set('name')} placeholder="Ava Sharma" />}
+                {(p) => <input {...p} type="text" autoComplete="name" value={form.name} onChange={set('name')} placeholder="Your name" />}
               </Field>
             )}
 
@@ -100,18 +94,6 @@ export default function AuthPage({ initialMode = 'login', navigate }) {
               {mode === 'login' ? 'Log in' : 'Create account'}
             </button>
           </form>
-
-          <div className="demo">
-            <p>Just exploring? Use a demo account.</p>
-            <div className="demo-row">
-              <button type="button" className="btn btn-small" onClick={() => fillDemo('ava@skillduels.dev', 'Player@123')}>
-                <Icon name="user" size={16} /> Player demo
-              </button>
-              <button type="button" className="btn btn-small" onClick={() => fillDemo('admin@skillduels.dev', 'Admin@123')}>
-                <Icon name="settings" size={16} /> Admin demo
-              </button>
-            </div>
-          </div>
         </div>
       </section>
     </div>

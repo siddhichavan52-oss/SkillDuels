@@ -105,8 +105,8 @@ export default function Landing({ navigate }) {
                 </button>
               </div>
               <p className="lp-demo-note">
-                Want a look first?{' '}
-                <button type="button" className="text-link" onClick={() => navigate('/login')}>Use a demo account</button>
+                Already have an account?{' '}
+                <button type="button" className="text-link" onClick={() => navigate('/login')}>Log in here</button>
               </p>
             </div>
 
